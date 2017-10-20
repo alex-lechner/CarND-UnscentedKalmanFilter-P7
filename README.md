@@ -1,92 +1,72 @@
-# Unscented Kalman Filter Project Starter Code
-Self-Driving Car Engineer Nanodegree Program
-
-In this project utilize an Unscented Kalman Filter to estimate the state of a moving object of interest with noisy lidar and radar measurements. Passing the project requires obtaining RMSE values that are lower that the tolerance outlined in the project reburic. 
-
-This project involves the Term 2 Simulator which can be downloaded [here](https://github.com/udacity/self-driving-car-sim/releases)
-
-This repository includes two files that can be used to set up and intall [uWebSocketIO](https://github.com/uWebSockets/uWebSockets) for either Linux or Mac systems. For windows you can use either Docker, VMware, or even [Windows 10 Bash on Ubuntu](https://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/) to install uWebSocketIO. Please see [this concept in the classroom](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/16cf4a78-4fc7-49e1-8621-3450ca938b77) for the required version and installation scripts.
-
-Once the install for uWebSocketIO is complete, the main program can be built and ran by doing the following from the project top directory.
-
-1. mkdir build
-2. cd build
-3. cmake ..
-4. make
-5. ./UnscentedKF
-
-Tips for setting up your environment can be found [here](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/23d376c7-0195-4276-bdf0-e02f1f3c665d)
-
-Note that the programs that need to be written to accomplish the project are src/ukf.cpp, src/ukf.h, tools.cpp, and tools.h
-
-The program main.cpp has already been filled out, but feel free to modify it.
-
-Here is the main protcol that main.cpp uses for uWebSocketIO in communicating with the simulator.
-
-
-INPUT: values provided by the simulator to the c++ program
-
-["sensor_measurement"] => the measurment that the simulator observed (either lidar or radar)
-
-
-OUTPUT: values provided by the c++ program to the simulator
-
-["estimate_x"] <= kalman filter estimated position x
-["estimate_y"] <= kalman filter estimated position y
-["rmse_x"]
-["rmse_y"]
-["rmse_vx"]
-["rmse_vy"]
+# Unscented Kalman Filters
 
 ---
 
-## Other Important Dependencies
-* cmake >= 3.5
-  * All OSes: [click here for installation instructions](https://cmake.org/install/)
-* make >= 4.1 (Linux, Mac), 3.81 (Windows)
-  * Linux: make is installed by default on most Linux distros
-  * Mac: [install Xcode command line tools to get make](https://developer.apple.com/xcode/features/)
-  * Windows: [Click here for installation instructions](http://gnuwin32.sourceforge.net/packages/make.htm)
-* gcc/g++ >= 5.4
-  * Linux: gcc / g++ is installed by default on most Linux distros
-  * Mac: same deal as make - [install Xcode command line tools](https://developer.apple.com/xcode/features/)
-  * Windows: recommend using [MinGW](http://www.mingw.org/)
+**Unscented Kalman Filters Project**
 
-## Basic Build Instructions
+The goals / steps of this project are the following:
 
-1. Clone this repo.
-2. Make a build directory: `mkdir build && cd build`
-3. Compile: `cmake .. && make`
-4. Run it: `./UnscentedKF` Previous versions use i/o from text files.  The current state uses i/o
-from the simulator.
+* Initialize properties
+* Tune noise parameters
+* Predict Sigma points, state, and covariance matrix
+* Update the state and covariance matrix based on Lidar and Radar measurements
+* The RMSE (root-mean-square error) of the position data px, py, vx, vy should be less than or equal to the values [.09, .10, .40, .30]
+* Calculate the NIS (filter consistency)
 
-## Editor Settings
+[//]: # (References)
+[simulator]: https://github.com/udacity/self-driving-car-sim/releases
+[win 10 update]: https://support.microsoft.com/de-de/help/4028685/windows-get-the-windows-10-creators-update
+[uWebSocketIO]: https://github.com/uWebSockets/uWebSockets
+[linux on win 10]: https://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/
+[MinGW]: http://www.mingw.org/
+[CMake]: https://cmake.org/install/
+[udacity code]: https://github.com/udacity/CarND-Unscented-Kalman-Filter-Project
 
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
+---
 
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
+## Files Submitted & Code Quality
 
-## Code Style
+### 1. Submission includes all required files and every TODO task has been accomplished 
 
-Please stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html) as much as possible.
+For this project, I have used the [Unscented Kalman Filter Project Starter Code][udacity code] from Udacity and I have modified the following five files:
+```cpp
+ukf.cpp
+ukf.h
+tools.cpp
+```
 
-## Generating Additional Data
+The ```ukf.cpp``` file initializes all process and measurement matrices from line 77 - 98. After the first initialization of the state `x_`, the state then gets predicted in the `void UKF::Prediction()` function on line 106. After the prediction, we update the state and covariance matrices based on the sensor type from line 111 - 115 in ```ukf.cpp```. The functions `void UKF::UpdateRadar()` on line 304 and `void UKF::UpdateLidar()` on line 245 update the measurements for the sensor types. The main difference between both sensor types is the transformation of sigma points into measurement space. While Radar has three rows in the sigma matrix (rho, phi, rho dot), Lidar has only two rows (px, py). The calculation of the covariance (line 125), the cross-correlation (line 141) and NIS (line 155) stays the same.
+The `VectorXd Tools::CalculateRMSE()` function on line 12 in the ```tools.cpp``` file calculates the root-mean-squared error and returns the value. 
 
-This is optional!
+### 2. Code must compile without errors
 
-If you'd like to generate your own radar and lidar data, see the
-[utilities repo](https://github.com/udacity/CarND-Mercedes-SF-Utilities) for
-Matlab scripts that can generate additional data.
+This project was done on Windows 10. In order to set up this project I had to:
+* update my Windows 10 Version with the [Windows 10 Creators Update][win 10 update]
+* install the [Linux Bash Shell][linux on win 10] (with Ubuntu 16.04) for Windows 10
+* set up and install [uWebSocketIO][uWebSocketIO] through the Linux Bash Shell for Windows 10
+* [download the simulator from Udacity][simulator]
 
-## Project Instructions and Rubric
+**To update the Linux Bash Shell to Ubuntu 16.04 the Windows 10 Creators Update has to be installed!**
 
-This information is only accessible by people who are already enrolled in Term 2
-of CarND. If you are enrolled, see [the project page](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/c3eb3583-17b2-4d83-abf7-d852ae1b9fff/concepts/f437b8b0-f2d8-43b0-9662-72ac4e4029c1)
-for instructions and the project rubric.
+Also, [CMake][CMake] and a gcc/g++ compiler like [MinGW][MinGW] is required in order to compile and build the project.
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+Once the install for uWebSocketIO is complete, the main program can be built and run by doing the following from the project top directory in the Linux Bash Shell.
 
+1. `mkdir build`
+2. `cd build`
+3. `cmake .. -G "Unix Makefiles" && make` on Windows 10 or `cmake .. && make` on Linux or Mac
+4. `./UnscentedKF`
+
+Then the simulator has to be started and *Project 1/2: EKF and UKF* has to be selected. When everything is set up the Linux Bash Shell should print: 
+```bash 
+Listening to Port 4567
+Connected
+```
+
+---
+
+## Discussion
+
+### 1. Briefly discuss any problems / issues you faced in your implementation of this project.
+I had the problem that the car in the simulator stopped after the 3rd time step. After some debugging I found out that my program got stuck in an infinite loop in the `void UKF::AngleNormalization()` function on line 120 in `ukf.cpp`. This was because I've messed up the calculation of the predicted sigma points and therefore some values in the matrix were too big. 
+After I have fixed this problem, I got rid of the infinite loop and my program was running as expected.
